@@ -585,8 +585,12 @@ function Rilievo() {
                       <td style={{ padding: '5px 3px', textAlign: 'right', color: w ? C.tblVal : C.tblDim, fontSize: '11px' }}>{w ? w.y.toFixed(3) : '—'}</td>
                       <td style={{ padding: '5px 3px', textAlign: 'right', color: sig && (sig.sx > 0 || sig.sy > 0) ? C.lsGreen : C.tblDim, fontSize: '11px' }}>{sig ? (sig.sx === 0 && sig.sy === 0 ? 'fisso' : `±${Math.max(sig.sx, sig.sy).toFixed(0)}`) : '—'}</td>
                       <td style={{ padding: '5px 3px', textAlign: 'center' }}>
-                        <button onClick={() => { setPts(p => p.filter(x => x.id !== p.id)); setSegs(p => p.filter(x => x.p1 !== p.id && x.p2 !== p.id)); setAngles(p => p.filter(x => x.vertex !== p.id && x.p1 !== p.id && x.p2 !== p.id)); }}
-                          style={{ background: 'none', border: 'none', color: '#d8304050', cursor: 'pointer', fontSize: 14, fontFamily: 'inherit', padding: '0 4px' }}>✕</button>
+                        <button onClick={() => {
+                          const id = p.id;
+                          setPts(prev => prev.filter(x => x.id !== id));
+                          setSegs(prev => prev.filter(x => x.p1 !== id && x.p2 !== id));
+                          setAngles(prev => prev.filter(x => x.vertex !== id && x.p1 !== id && x.p2 !== id));
+                        }} style={{ background: 'none', border: 'none', color: '#ff4455', cursor: 'pointer', fontSize: 18, fontFamily: 'inherit', padding: '0 6px' }}>✕</button>
                       </td>
                     </tr>;
                   })}
@@ -615,7 +619,7 @@ function Rilievo() {
                         {delta != null ? `${delta >= 0 ? '+' : ''}${(delta * 100).toFixed(0)}` : '—'}
                       </td>
                       <td style={{ padding: '5px 3px', textAlign: 'center' }}>
-                        <button onClick={e => { e.stopPropagation(); setSegs(p => p.filter(x => x.id !== s.id)); }} style={{ background: 'none', border: 'none', color: '#d8304050', cursor: 'pointer', fontSize: 14, fontFamily: 'inherit', padding: '0 4px' }}>✕</button>
+                        <button onClick={e => { e.stopPropagation(); const id = s.id; setSegs(prev => prev.filter(x => x.id !== id)); }} style={{ background: 'none', border: 'none', color: '#ff4455', cursor: 'pointer', fontSize: 18, fontFamily: 'inherit', padding: '0 6px' }}>✕</button>
                       </td>
                     </tr>;
                   })}
@@ -673,14 +677,14 @@ function Rilievo() {
                     const wv = world[a.vertex], w1 = world[a.p1], w2 = world[a.p2];
                     let calcAng = null, deltaAng = null;
                     if (wv && w1 && w2) { let ag = Math.atan2(w2.y - wv.y, w2.x - wv.x) - Math.atan2(w1.y - wv.y, w1.x - wv.x); while (ag < 0) ag += 2 * Math.PI; while (ag > 2 * Math.PI) ag -= 2 * Math.PI; calcAng = ag * 180 / Math.PI; deltaAng = calcAng - a.angle; while (deltaAng > 180) deltaAng -= 360; while (deltaAng < -180) deltaAng += 360; }
-                    const col = deltaAng == null ? '#2a4868' : Math.abs(deltaAng) < .1 ? '#00b86a' : Math.abs(deltaAng) < .5 ? '#e09020' : '#d83040';
-                    return <tr key={a.id} onClick={() => { setEditAngle({ ...a }); setEditAngVal(String(a.angle)); }} style={{ borderBottom: '1px solid #0e1828', cursor: 'pointer' }}>
-                      <td style={{ padding: '5px 3px' }}><span style={{ color: col, marginRight: 4 }}>∠</span><span style={{ color: '#7090a8' }}>{p1?.label}{pv?.label}{p2?.label}</span></td>
-                      <td style={{ padding: '5px 3px', textAlign: 'right', color: '#90b0c8' }}>{a.angle.toFixed(1)}</td>
-                      <td style={{ padding: '5px 3px', textAlign: 'right', color: '#306858' }}>{calcAng != null ? calcAng.toFixed(1) : '—'}</td>
-                      <td style={{ padding: '5px 3px', textAlign: 'right', color: col }}>{deltaAng != null ? `${deltaAng >= 0 ? '+' : ''}${deltaAng.toFixed(1)}` : '—'}</td>
+                    const col = deltaAng == null ? C.tblDim : Math.abs(deltaAng) < .1 ? SC.ok : Math.abs(deltaAng) < .5 ? SC.warn : SC.error;
+                    return <tr key={a.id} onClick={() => { setEditAngle({ ...a }); setEditAngVal(String(a.angle)); }} style={{ borderBottom: `1px solid ${C.gridMin}`, cursor: 'pointer' }}>
+                      <td style={{ padding: '5px 3px' }}><span style={{ color: col, marginRight: 4 }}>∠</span><span style={{ color: C.tblVal, fontWeight: 'bold' }}>{p1?.label}{pv?.label}{p2?.label}</span></td>
+                      <td style={{ padding: '5px 3px', textAlign: 'right', color: C.tblVal }}>{a.angle.toFixed(1)}</td>
+                      <td style={{ padding: '5px 3px', textAlign: 'right', color: C.lsGreen }}>{calcAng != null ? calcAng.toFixed(1) : '—'}</td>
+                      <td style={{ padding: '5px 3px', textAlign: 'right', color: col, fontWeight: 'bold' }}>{deltaAng != null ? `${deltaAng >= 0 ? '+' : ''}${deltaAng.toFixed(1)}` : '—'}</td>
                       <td style={{ padding: '5px 3px', textAlign: 'center' }}>
-                        <button onClick={e => { e.stopPropagation(); setAngles(p => p.filter(x => x.id !== a.id)); }} style={{ background: 'none', border: 'none', color: '#d8304050', cursor: 'pointer', fontSize: 14, fontFamily: 'inherit', padding: '0 4px' }}>✕</button>
+                        <button onClick={e => { e.stopPropagation(); const id = a.id; setAngles(prev => prev.filter(x => x.id !== id)); }} style={{ background: 'none', border: 'none', color: '#ff4455', cursor: 'pointer', fontSize: 18, fontFamily: 'inherit', padding: '0 6px' }}>✕</button>
                       </td>
                     </tr>;
                   })}
